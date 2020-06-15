@@ -3,6 +3,7 @@ package edu.iis.mto.bdd.trains.services;
 import edu.iis.mto.bdd.trains.model.Line;
 import org.joda.time.Duration;
 import org.joda.time.LocalTime;
+import org.joda.time.Minutes;
 import org.joda.time.Period;
 
 import java.util.LinkedList;
@@ -22,13 +23,15 @@ public class StandardIntineraryService implements IntineraryService {
 	public List<LocalTime> findNextDepartures(String departure, String destination, LocalTime startTime) {
 		List<LocalTime> rV = new LinkedList<>();
 		
-		for(Line line : timetableService.findLinesThrough(departure, destination)){
-			rV.addAll(timetableService.findArrivalTimes(line, destination)
-					.stream()
-					.filter(time -> time.isAfter(startTime))
-					.filter(time -> time.plus(timeWindow).isAfter(startTime))
-					.collect(Collectors.toList()));
+		for (Line line : timetableService.findLinesThrough(departure, destination)) {
+			rV.addAll(
+					timetableService.findArrivalTimes(line, departure)
+							.stream()
+//							.filter(time -> startTime.plus(timeWindow).isAfter(time))
+							.filter(time -> startTime.plusMinutes(15).compareTo(time) >= 0 && startTime.compareTo(time) < 0)
+							.collect(Collectors.toList()));
 		}
+		
 		return rV;
 	}
 	
