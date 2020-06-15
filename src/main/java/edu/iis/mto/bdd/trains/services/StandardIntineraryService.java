@@ -27,8 +27,7 @@ public class StandardIntineraryService implements IntineraryService {
 			rV.addAll(
 					timetableService.findArrivalTimes(line, departure)
 							.stream()
-//							.filter(time -> startTime.plus(timeWindow).isAfter(time))
-							.filter(time -> startTime.plusMinutes(15).compareTo(time) >= 0 && startTime.compareTo(time) < 0)
+							.filter(time -> startTime.plus(timeWindow).compareTo(time) >= 0 && startTime.compareTo(time) < 0)
 							.collect(Collectors.toList()));
 		}
 		

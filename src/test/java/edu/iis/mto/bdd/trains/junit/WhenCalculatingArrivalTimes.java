@@ -43,7 +43,7 @@ public class WhenCalculatingArrivalTimes {
 		exampleLine = new Line.LineBuilder("Line").departingFrom(firstStation).withStations(stations);
 		startTime = LocalTime.now();
 		
-		service = new StandardIntineraryService(timetableService, Period.minutes(5));
+		service = new StandardIntineraryService(timetableService, Period.minutes(15));
 	}
 	
 	@Test
@@ -60,14 +60,13 @@ public class WhenCalculatingArrivalTimes {
 	@Test
 	public void findDepartureToLastProperStationShouldReturnListWithProperArrivalTime() {
 		LocalTime midlleArrivalTime = startTime.plusMinutes(10);
-		LocalTime lastArrivalTime = midlleArrivalTime.plusMinutes(20);
-		List<LocalTime> arrivalTimes = List.of(midlleArrivalTime, lastArrivalTime);
+		LocalTime lastArrivalTime = midlleArrivalTime.plusMinutes(13);
+		List<LocalTime> arrivalTimes = List.of(startTime, midlleArrivalTime, lastArrivalTime);
 		
 		prepareStandardTimetableService(arrivalTimes);
 		
-		LocalTime afterFirstDeparture = this.startTime.plusMinutes(20);
-		List<LocalTime> times = service.findNextDepartures(firstStation, lastStation, afterFirstDeparture);
-		assertThat(times, is(List.of(lastArrivalTime)));
+		List<LocalTime> times = service.findNextDepartures(firstStation, lastStation, startTime);
+		assertThat(times, is(List.of(midlleArrivalTime)));
 	}
 	
 	@Test
