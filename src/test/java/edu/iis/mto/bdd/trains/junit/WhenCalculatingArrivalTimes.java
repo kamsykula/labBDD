@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -33,6 +34,7 @@ public class WhenCalculatingArrivalTimes {
 	private String lastStation;
 	private String[] stations;
 	private Line exampleLine;
+	private LocalTime startTime;
 	
 	
 	@Before
@@ -47,11 +49,11 @@ public class WhenCalculatingArrivalTimes {
 		
 		
 		exampleLine = new Line.LineBuilder("Line").departingFrom(firstStation).withStations(stations);
+		startTime = LocalTime.now();
 	}
 	
 	@Test
-	public void findTheNextProperStationShouldReturnListWithOneArrivalTime() {
-		LocalTime startTime = LocalTime.now();
+	public void findTheNextProperStationShouldReturnListWithAtLeastOneArrivalTime() {
 		LocalTime arrivalTime = startTime.plusMinutes(5);
 		
 		prepareStandardTimetableService(Collections.singletonList(arrivalTime));
@@ -62,16 +64,25 @@ public class WhenCalculatingArrivalTimes {
 	
 	
 	@Test
-	public void findLastProperStationShouldReturnListWithProperArrivalTime() {
-		LocalTime startTime = LocalTime.now();
+	public void findDepartureToLastProperStationShouldReturnListWithProperArrivalTime() {
 		LocalTime midlleArrivalTime = startTime.plusMinutes(5);
 		LocalTime lastArrivalTime = midlleArrivalTime.plusMinutes(5);
 		List<LocalTime> arrivalTimes = List.of(midlleArrivalTime, lastArrivalTime);
 		
 		prepareStandardTimetableService(arrivalTimes);
 		
+		LocalTime afterFirstDeparture = this.startTime.plusMinutes(6);
+		List<LocalTime> times = service.findNextDepartures(firstStation, lastStation, afterFirstDeparture);
+		assertThat(times, is(List.of(lastArrivalTime)));
+	}
+	
+	@Test
+	public void whenLineWithGivenDestinationNotExistShouldReturnEmptyList() {
+		prepareStandardTimetableService(Collections.EMPTY_LIST);
+		
 		List<LocalTime> times = service.findNextDepartures(firstStation, middleStation, startTime);
-		assertThat(times, is(arrivalTimes));
+		
+		assertThat(times, hasSize(0));
 	}
 	
 	private void prepareStandardTimetableService(List<LocalTime> localTimes) {
