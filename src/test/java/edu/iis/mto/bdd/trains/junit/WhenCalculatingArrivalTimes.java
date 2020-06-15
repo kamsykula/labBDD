@@ -4,17 +4,11 @@ import edu.iis.mto.bdd.trains.model.Line;
 import edu.iis.mto.bdd.trains.services.IntineraryService;
 import edu.iis.mto.bdd.trains.services.StandardIntineraryService;
 import edu.iis.mto.bdd.trains.services.TimetableService;
-import org.hamcrest.MatcherAssert;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
-import org.jruby.embed.Extension;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.exceptions.base.MockitoException;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,8 +34,6 @@ public class WhenCalculatingArrivalTimes {
 	@Before
 	public void beforeEach() {
 		timetableService = mock(TimetableService.class);
-		service = new StandardIntineraryService(timetableService, Period.minutes(15));
-		
 		firstStation = "Station 0";
 		middleStation = "Station 1";
 		lastStation = "Station 3";
@@ -50,11 +42,13 @@ public class WhenCalculatingArrivalTimes {
 		
 		exampleLine = new Line.LineBuilder("Line").departingFrom(firstStation).withStations(stations);
 		startTime = LocalTime.now();
+		
+		service = new StandardIntineraryService(timetableService, Period.minutes(5));
 	}
 	
 	@Test
 	public void findTheNextProperStationShouldReturnListWithAtLeastOneArrivalTime() {
-		LocalTime arrivalTime = startTime.plusMinutes(5);
+		LocalTime arrivalTime = startTime.plusMinutes(4);
 		
 		prepareStandardTimetableService(Collections.singletonList(arrivalTime));
 		
@@ -65,13 +59,13 @@ public class WhenCalculatingArrivalTimes {
 	
 	@Test
 	public void findDepartureToLastProperStationShouldReturnListWithProperArrivalTime() {
-		LocalTime midlleArrivalTime = startTime.plusMinutes(5);
-		LocalTime lastArrivalTime = midlleArrivalTime.plusMinutes(5);
+		LocalTime midlleArrivalTime = startTime.plusMinutes(10);
+		LocalTime lastArrivalTime = midlleArrivalTime.plusMinutes(20);
 		List<LocalTime> arrivalTimes = List.of(midlleArrivalTime, lastArrivalTime);
 		
 		prepareStandardTimetableService(arrivalTimes);
 		
-		LocalTime afterFirstDeparture = this.startTime.plusMinutes(6);
+		LocalTime afterFirstDeparture = this.startTime.plusMinutes(20);
 		List<LocalTime> times = service.findNextDepartures(firstStation, lastStation, afterFirstDeparture);
 		assertThat(times, is(List.of(lastArrivalTime)));
 	}
