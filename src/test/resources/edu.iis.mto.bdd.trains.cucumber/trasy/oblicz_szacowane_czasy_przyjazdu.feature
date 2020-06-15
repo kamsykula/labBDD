@@ -12,4 +12,7 @@ Szablon scenariusza: Szacowanie czasu przyjazdu
 
     Przykłady:
     | skąd          |      dokąd    |       linia     | czas_odjazdu |   czas_przyjazdu   |
-    | Parramatta    | Town Hall     | 8:02            | Western      | 8:29               |
+    | Parramatta    | Town Hall     | Western         | 8:02         | 8:29               |
+    | Epping        | Central       | Northern        | 8:03         | 8:48               |
+    | Epping        | Central       | Newcastle       | 8:07         | 8:37               |
+    | Epping        | Central       | Epping          | 8:13         | 8:51               |
