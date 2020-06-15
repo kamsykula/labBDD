@@ -28,12 +28,25 @@ public class WhenCalculatingArrivalTimes {
 	
 	private TimetableService timetableService;
 	private IntineraryService service;
+	private String firstStation;
+	private String middleStation;
+	private String lastStation;
+	private String[] stations;
+	private Line exampleLine;
 	
 	
 	@Before
 	public void beforeEach() {
 		timetableService = mock(TimetableService.class);
 		service = new StandardIntineraryService(timetableService, Period.minutes(15));
+		
+		firstStation = "Station 0";
+		middleStation = "Station 1";
+		lastStation = "Station 3";
+		stations = new String[]{firstStation, middleStation, lastStation};
+		
+		
+		exampleLine = new Line.LineBuilder("Line").departingFrom(firstStation).withStations(stations);
 	}
 	
 	@Test
@@ -42,11 +55,11 @@ public class WhenCalculatingArrivalTimes {
 		LocalTime arrivalTime = startTime.plusMinutes(5);
 		
 		when(timetableService.findLinesThrough(any(String.class), any(String.class)))
-				.thenReturn(Collections.singletonList(new Line.LineBuilder("Line").departingFrom("Station 0").withStations("Station 1")));
+				.thenReturn(Collections.singletonList(exampleLine));
 		when(timetableService.findArrivalTimes(any(Line.class), any(String.class)))
 				.thenReturn(Collections.singletonList(arrivalTime));
 		
-		List<LocalTime> times = service.findNextDepartures("Station 0", "Station 1", startTime);
+		List<LocalTime> times = service.findNextDepartures(firstStation, middleStation, startTime);
 		assertThat(times, is(List.of(arrivalTime)));
 	}
 	
