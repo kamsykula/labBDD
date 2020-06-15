@@ -54,13 +54,30 @@ public class WhenCalculatingArrivalTimes {
 		LocalTime startTime = LocalTime.now();
 		LocalTime arrivalTime = startTime.plusMinutes(5);
 		
-		when(timetableService.findLinesThrough(any(String.class), any(String.class)))
-				.thenReturn(Collections.singletonList(exampleLine));
-		when(timetableService.findArrivalTimes(any(Line.class), any(String.class)))
-				.thenReturn(Collections.singletonList(arrivalTime));
+		prepareStandardTimetableService(Collections.singletonList(arrivalTime));
 		
 		List<LocalTime> times = service.findNextDepartures(firstStation, middleStation, startTime);
 		assertThat(times, is(List.of(arrivalTime)));
 	}
 	
+	
+	@Test
+	public void findLastProperStationShouldReturnListWithProperArrivalTime() {
+		LocalTime startTime = LocalTime.now();
+		LocalTime midlleArrivalTime = startTime.plusMinutes(5);
+		LocalTime lastArrivalTime = midlleArrivalTime.plusMinutes(5);
+		List<LocalTime> arrivalTimes = List.of(midlleArrivalTime, lastArrivalTime);
+		
+		prepareStandardTimetableService(arrivalTimes);
+		
+		List<LocalTime> times = service.findNextDepartures(firstStation, middleStation, startTime);
+		assertThat(times, is(arrivalTimes));
+	}
+	
+	private void prepareStandardTimetableService(List<LocalTime> localTimes) {
+		when(timetableService.findLinesThrough(any(String.class), any(String.class)))
+				.thenReturn(Collections.singletonList(exampleLine));
+		when(timetableService.findArrivalTimes(any(Line.class), any(String.class)))
+				.thenReturn(localTimes);
+	}
 }
